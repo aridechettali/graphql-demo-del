@@ -1,4 +1,4 @@
-package com.graphql.demo.graphqldemo;
+package com.graphql.demo.main;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,5 +9,4 @@ class GraphqlDemoApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }

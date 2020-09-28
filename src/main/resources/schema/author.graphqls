@@ -1,0 +1,12 @@
+directive @fetch(from : String!) on FIELD_DEFINITION
+
+extend type Query{
+    authorById(id: ID): Author
+}
+
+
+type Author {
+    id: ID
+    firstName: String
+    lastName: String @fetch(from:"lName")
+}

@@ -1,7 +1,8 @@
-package com.graphql.demo.graphqldemo;
+package com.graphql.demo.main;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
+import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.RuntimeWiring;
@@ -28,14 +29,23 @@ public class GraphQLProvider {
 
     @PostConstruct
     public void init() throws IOException {
-        URL url = Resources.getResource("schema.graphqls");
-        String sdl = Resources.toString(url, Charsets.UTF_8);
-        GraphQLSchema graphQLSchema = buildSchema(sdl);
+        URL book = Resources.getResource("schema/book.graphqls");
+        String bookSdl = Resources.toString(book, Charsets.UTF_8);
+
+        URL author = Resources.getResource("schema/author.graphqls");
+        String authorSdl = Resources.toString(author, Charsets.UTF_8);
+
+        GraphQLSchema graphQLSchema = buildSchema(bookSdl,authorSdl);
         this.graphQL = GraphQL.newGraphQL(graphQLSchema).build();
+
     }
 
-    private GraphQLSchema buildSchema(String sdl) {
-        TypeDefinitionRegistry typeRegistry = new SchemaParser().parse(sdl);
+    private GraphQLSchema buildSchema(String bookSdl,String authorSdl) {
+
+        SchemaParser schemaParser = new SchemaParser();
+        TypeDefinitionRegistry typeRegistry = new TypeDefinitionRegistry();
+        typeRegistry.merge(schemaParser.parse(bookSdl));
+        typeRegistry.merge(schemaParser.parse(authorSdl));
         RuntimeWiring runtimeWiring = buildWiring();
         SchemaGenerator schemaGenerator = new SchemaGenerator();
         return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);
@@ -43,10 +53,11 @@ public class GraphQLProvider {
 
     private RuntimeWiring buildWiring() {
         return RuntimeWiring.newRuntimeWiring()
-                .type(newTypeWiring("Query")
-                        .dataFetcher("bookById", graphQLDataFetchers.getBookByIdDataFetcher()))
-                .type(newTypeWiring("Book")
-                        .dataFetcher("author", graphQLDataFetchers.getAuthorDataFetcher()))
+                .type(newTypeWiring("Query").dataFetcher("bookById", graphQLDataFetchers.getBookByIdDataFetcher()))
+                .type(newTypeWiring("Book").dataFetcher("author", graphQLDataFetchers.getAuthorDataFetcher()))
+                .type(newTypeWiring("Query").dataFetcher("authorById", graphQLDataFetchers.getAuthorByIdDataFetcher()))
+                .type(newTypeWiring("Query").dataFetcher("findAllBooks",graphQLDataFetchers.getAllBooks()))
+                .type(newTypeWiring("Mutation").dataFetcher("newBook",graphQLDataFetchers.newBook()))
                 .build();
     }
 
