@@ -8,5 +8,5 @@ import lombok.Data;
 public class Author {
     private String id;
     private String firstName;
-    private String lName;
+    private String lastName;
 }

@@ -1,68 +1,51 @@
 package com.graphql.demo.main;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
-import graphql.ExecutionResult;
-import graphql.GraphQL;
+
+import com.graphql.demo.resolvers.BookResolver;
+import com.graphql.demo.resolvers.MutationResolver;
+import com.graphql.demo.resolvers.QueryResolver;
+
+import graphql.execution.AsyncExecutionStrategy;
+import graphql.execution.ExecutionStrategy;
 import graphql.schema.GraphQLSchema;
-import graphql.schema.idl.RuntimeWiring;
-import graphql.schema.idl.SchemaGenerator;
-import graphql.schema.idl.SchemaParser;
-import graphql.schema.idl.TypeDefinitionRegistry;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.coxautodev.graphql.tools.SchemaParser;
+
+
+import graphql.servlet.SimpleGraphQLServlet;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import javax.annotation.PostConstruct;
-import java.io.IOException;
-import java.net.URL;
+import javax.servlet.http.HttpServlet;
 
-import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
 
 @Component
 public class GraphQLProvider {
 
-    @Autowired
-    GraphQLDataFetchers graphQLDataFetchers;
+    @Bean
+    public ServletRegistrationBean buildSchema() {
 
-    private GraphQL graphQL;
-
-    @PostConstruct
-    public void init() throws IOException {
-        URL book = Resources.getResource("schema/book.graphqls");
-        String bookSdl = Resources.toString(book, Charsets.UTF_8);
-
-        URL author = Resources.getResource("schema/author.graphqls");
-        String authorSdl = Resources.toString(author, Charsets.UTF_8);
-
-        GraphQLSchema graphQLSchema = buildSchema(bookSdl,authorSdl);
-        this.graphQL = GraphQL.newGraphQL(graphQLSchema).build();
-
-    }
-
-    private GraphQLSchema buildSchema(String bookSdl,String authorSdl) {
-
-        SchemaParser schemaParser = new SchemaParser();
-        TypeDefinitionRegistry typeRegistry = new TypeDefinitionRegistry();
-        typeRegistry.merge(schemaParser.parse(bookSdl));
-        typeRegistry.merge(schemaParser.parse(authorSdl));
-        RuntimeWiring runtimeWiring = buildWiring();
-        SchemaGenerator schemaGenerator = new SchemaGenerator();
-        return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);
-    }
-
-    private RuntimeWiring buildWiring() {
-        return RuntimeWiring.newRuntimeWiring()
-                .type(newTypeWiring("Query").dataFetcher("bookById", graphQLDataFetchers.getBookByIdDataFetcher()))
-                .type(newTypeWiring("Book").dataFetcher("author", graphQLDataFetchers.getAuthorDataFetcher()))
-                .type(newTypeWiring("Query").dataFetcher("authorById", graphQLDataFetchers.getAuthorByIdDataFetcher()))
-                .type(newTypeWiring("Query").dataFetcher("findAllBooks",graphQLDataFetchers.getAllBooks()))
-                .type(newTypeWiring("Mutation").dataFetcher("newBook",graphQLDataFetchers.newBook()))
-                .build();
+        GraphQLSchema schema  = SchemaParser.newParser()
+                .resolvers(new BookResolver(), new MutationResolver(), new QueryResolver())
+                .file("schema/book.graphqls")
+                .file("schema/author.graphqls")
+                .build().makeExecutableSchema();
+        ExecutionStrategy executionStrategy = new AsyncExecutionStrategy();
+        HttpServlet servlet = new SimpleGraphQLServlet(schema, executionStrategy);
+        ServletRegistrationBean bean = new ServletRegistrationBean(servlet, "/graphql");
+        return bean;
     }
 
     @Bean
-    public GraphQL graphQL() {
-        return graphQL;
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurerAdapter() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("*").allowedOrigins("http://localhost:*");
+            }
+        };
     }
 }

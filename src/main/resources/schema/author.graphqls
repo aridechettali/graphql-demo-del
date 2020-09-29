@@ -1,4 +1,3 @@
-directive @fetch(from : String!) on FIELD_DEFINITION
 
 extend type Query{
     authorById(id: ID): Author
@@ -8,5 +7,5 @@ extend type Query{
 type Author {
     id: ID
     firstName: String
-    lastName: String @fetch(from:"lName")
+    lastName: String
 }
