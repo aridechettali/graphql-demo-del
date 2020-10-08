@@ -1,10 +1,8 @@
-package com.graphql.demo.main;
+package com.graphql.demo.server;
 
-
-import com.graphql.demo.resolvers.BookResolver;
-import com.graphql.demo.resolvers.MutationResolver;
-import com.graphql.demo.resolvers.QueryResolver;
-
+import com.graphql.demo.server.resolvers.BookResolver;
+import com.graphql.demo.server.resolvers.MutationResolver;
+import com.graphql.demo.server.resolvers.QueryResolver;
 import graphql.execution.AsyncExecutionStrategy;
 import graphql.execution.ExecutionStrategy;
 import graphql.schema.GraphQLSchema;

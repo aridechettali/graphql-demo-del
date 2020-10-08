@@ -1,4 +1,4 @@
-package com.graphql.demo.main;
+package com.graphql.demo.server.util;
 
 import com.graphql.demo.model.Author;
 import com.graphql.demo.model.Book;

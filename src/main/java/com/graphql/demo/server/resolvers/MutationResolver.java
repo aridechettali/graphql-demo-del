@@ -1,7 +1,7 @@
-package com.graphql.demo.resolvers;
+package com.graphql.demo.server.resolvers;
 
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
-import com.graphql.demo.main.DataRecords;
+import com.graphql.demo.server.util.DataRecords;
 import com.graphql.demo.model.Book;
 
 import lombok.AllArgsConstructor;

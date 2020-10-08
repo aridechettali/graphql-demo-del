@@ -1,13 +1,13 @@
-package com.graphql.demo.main;
+package com.graphql.demo.server;
 
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class GraphqlDemoApplication {
+public class ServerMain {
 
 	public static void main(String[] args) {
-		SpringApplication.run(GraphqlDemoApplication.class, args);
+		SpringApplication.run(ServerMain.class, args);
 	}
 }
