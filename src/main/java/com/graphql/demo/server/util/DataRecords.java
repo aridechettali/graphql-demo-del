@@ -11,6 +11,9 @@ import java.util.List;
 public class DataRecords {
 
     public static List<Book> bookData = getBookData();
+    public static List<Author> authorData = getAuthorData();
+
+
     public static List<Book> getBookData() {
         List<Book> bookData = new ArrayList<>();
         bookData.add(new Book("book-1","Harry Potter and the Philosopher's Stone","author-1",223));
@@ -19,7 +22,6 @@ public class DataRecords {
         return bookData;
     }
 
-    public static List<Author> authorData = getAuthorData();
     public static List<Author> getAuthorData() {
         List<Author> authorData = new ArrayList<>();
         authorData.add(new Author("author-1","Joanne","Rowling"));
