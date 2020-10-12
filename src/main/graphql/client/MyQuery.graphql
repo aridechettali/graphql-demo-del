@@ -1,0 +1,18 @@
+query BookDetail($id:ID!) {
+    bookById(id: $id) {
+        id
+        name
+    }
+}
+query BookDetails {
+    findAllBooks {
+        id
+        name
+        pageCount
+        author {
+            firstName
+            lastName
+        }
+    }
+}
+
